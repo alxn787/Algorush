@@ -4,7 +4,7 @@ import { motion, useAnimation } from "framer-motion"
 import { useEffect, useState } from "react"
 import { Star } from "lucide-react"
 
-export function GitHubStarButton() {
+export function StarButton() {
   const [isHovered, setIsHovered] = useState(false)
   const controls = useAnimation()
   const starIconControls = useAnimation()

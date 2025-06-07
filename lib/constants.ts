@@ -1,0 +1,32 @@
+exportconst cards = [
+  {
+    title: "Quick Sessions",
+    icon: <Timer className="h-4 w-4 text-yellow-400" />,
+    bg: "bg-yellow-500/5",
+    hover: "hover:border-yellow-700 hover:bg-yellow-500/10",
+    textTitle: "text-neutral-400",
+    textMain: "5-15 min",
+    textMainSize: "text-2xl",
+    textDesc: "Perfect for commutes, study breaks, or cramming before class. No fluff—just focus.",
+  },
+  {
+    title: "Master 100+ DSA Concepts",
+    icon: <Brain className="h-4 w-4 text-blue-400" />,
+    bg: "bg-blue-500/5",
+    hover: "hover:border-blue-700 hover:bg-blue-500/10",
+    textTitle: "text-neutral-400",
+    textMain: "From Arrays to  Graphs",
+    textMainSize: "text-xl",
+    textDesc: "Learn through targeted MCQs and code-driven challenges.",
+  },
+  {
+    title: "Made for Your Phone",
+    icon: <TrendingUp className="h-4 w-4 text-green-400" />,
+    bg: "bg-green-500/5",
+    hover: "hover:border-green-700 hover:bg-green-500/10",
+    textTitle: "text-neutral-400",
+    textMain: "Tap. Solve. Learn. Anywhere.",
+    textMainSize: "text-xl",
+    textDesc: "Just pure DSA practice on the go, whether you’re in bed or on a bus.",
+  },
+];
