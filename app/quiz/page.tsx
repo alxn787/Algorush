@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
-// This interface must match the JSON structure from the API
 interface Question {
   id: number;
   question: string;
@@ -170,7 +169,6 @@ const Quiz = () => {
     );
   }
 
-  // Handle the case where no questions are loaded (after loading, no error)
   if (questions.length === 0 && !isLoading && !error) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-4">
