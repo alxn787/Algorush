@@ -15,6 +15,7 @@ Your task is to generate 10 multiple-choice questions on the topic: "${category}
 Questions should contain incomplete code snippets, and the correct option should complete them.
 Questions should get harder as we move from 1 to 10.
 Focus more on code-heavy problems (finding bugs, optimizing, etc.) than theoretical questions.
+make it more puzzle like competitive programmming
 Give the code snippets in C++.
 Always return exactly 10 questions.
 

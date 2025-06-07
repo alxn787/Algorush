@@ -68,7 +68,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-black text-neutral-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-8">
         <motion.div
         initial={{ opacity: 0, }}
         animate={{ opacity: 1 }}
@@ -184,8 +184,9 @@ const Home = () => {
             ))}
           </div>
         </div>
-
-
+      </div>
+      <div className='flex justify-center pb-2 text-neutral-400'>
+        @<a href="https://x.com/alxn787">alxn787</a>
       </div>
     </div>
   )

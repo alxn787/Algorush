@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Loader2, ArrowLeft } from 'lucide-react';
 
 interface Question {
   id: number;
@@ -32,15 +32,13 @@ const Quiz = () => {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
-  // New state to track if quiz is ready to start (questions loaded, not showing result)
   const [quizReady, setQuizReady] = useState(false); 
 
-  // Fetch questions from the API when the component mounts
   useEffect(() => {
     const fetchQuestions = async () => {
       setIsLoading(true);
       setError(null);
-      setQuizReady(false); // Reset quiz readiness
+      setQuizReady(false);
       try {
         const response = await fetch('/api/questions', {
           method: 'POST',
@@ -57,7 +55,7 @@ const Quiz = () => {
         const data: Question[] = await response.json();
         if (Array.isArray(data) && data.length > 0) {
           setQuestions(data);
-          setQuizReady(true); 
+          setQuizReady(true);
         } else {
           setError('No questions found for this category.');
           setQuestions([]);
@@ -82,7 +80,7 @@ const Quiz = () => {
     } else if (quizReady && timeLeft === 0 && !showResult) {
       handleNext();
     }
-  }, [timeLeft, showResult, quizCompleted, quizReady]); 
+  }, [timeLeft, showResult, quizCompleted, quizReady]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
@@ -106,7 +104,7 @@ const Quiz = () => {
         setShowResult(false);
       } else {
         setQuizCompleted(true);
-        setQuizReady(false); 
+        setQuizReady(false);
       }
     }, 2000);
   };
@@ -115,7 +113,7 @@ const Quiz = () => {
     const fetchNewQuestions = async () => {
       setIsLoading(true);
       setError(null);
-      setQuizReady(false); 
+      setQuizReady(false);
       try {
         const response = await fetch('/api/questions', {
           method: 'POST',
@@ -133,7 +131,7 @@ const Quiz = () => {
           setQuizCompleted(false);
           setShowResult(false);
           setAnswers([]);
-          setQuizReady(true); // Set quiz ready after new questions are loaded
+          setQuizReady(true);
         } else {
           setError('No questions found for this category.');
           setQuestions([]);
@@ -207,7 +205,7 @@ const Quiz = () => {
               ))}
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button onClick={resetQuiz} className="flex-1 bg-primary hover:bg-primary/90">
                 Try Again
               </Button>
@@ -222,7 +220,6 @@ const Quiz = () => {
   }
   
   const question = questions[currentQuestion];
-  // Safeguard: Ensure 'question' is defined before accessing its properties
   if (!question) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-4">
@@ -239,12 +236,23 @@ const Quiz = () => {
       <Card className="w-full max-w-2xl bg-neutral-900/95 backdrop-blur border-neutral-800 text-white">
         <CardHeader>
           <div className="flex items-center justify-between mb-4">
-            <div className="text-sm text-primary font-semibold">{category}</div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span className={`font-mono text-lg ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : ''}`}>
-                {timeLeft}s
-              </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push('/')}
+              className="text-white hover:bg-neutral-700"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-primary font-semibold">{category}</div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span className={`font-mono text-lg ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : ''}`}>
+                  {timeLeft}s
+                </span>
+              </div>
             </div>
           </div>
           <Progress value={progress} className="h-2 bg-neutral-800" />
