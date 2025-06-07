@@ -106,17 +106,16 @@ const Quiz = () => {
         setShowResult(false);
       } else {
         setQuizCompleted(true);
-        setQuizReady(false); // Quiz no longer ready when completed
+        setQuizReady(false); 
       }
     }, 2000);
   };
 
   const resetQuiz = () => {
-    // Re-fetch questions for a new quiz
     const fetchNewQuestions = async () => {
       setIsLoading(true);
       setError(null);
-      setQuizReady(false); // Reset quiz readiness on reset
+      setQuizReady(false); 
       try {
         const response = await fetch('/api/questions', {
           method: 'POST',
