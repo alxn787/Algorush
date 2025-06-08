@@ -137,6 +137,7 @@ const Quiz = () => {
           setQuestions([]);
         }
       } catch (err) {
+        console.error('Error fetching new questions:', err);
         setError('Could not restart quiz. Please try again.');
       } finally {
         setIsLoading(false);
