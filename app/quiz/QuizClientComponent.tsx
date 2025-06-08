@@ -50,8 +50,7 @@ const QuizClientComponent = () => {
         setError('No questions found for this category.');
         setQuestions([]);
       }
-    } catch (err: any) {
-      setError(err.message || 'Could not load quiz. Please try again later.');
+    } catch (err) {
       console.error(err);
     } finally {
       setIsLoading(false);
