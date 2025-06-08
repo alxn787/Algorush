@@ -85,7 +85,7 @@ const Home = () => {
               Master DSA with lightning-fast AI quizzes.
             </p>
             <p className="text-lg md:text-2xl text-neutral-400 max-w-3xl mx-auto mt-2">
-              Built for brainy bursts — even on your bus ride! 🚌
+              Built for brainy bursts — AnyWhere! AnyTime! 
             </p>
           </div>
 
@@ -129,7 +129,7 @@ const Home = () => {
             </CardHeader>
             <CardContent>
               <div className="text-xl font-bold text-neutral-50 pb-2">Tap. Solve. Learn. Anywhere.</div>
-              <p className="text-sm text-neutral-400">Just pure DSA practice on the go, whether you’re in bed or on a bus.</p>
+              <p className="text-sm text-neutral-400">Just pure DSA practice on the go, whether you’re in bed or on hitching your ride to classes.</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -153,7 +153,7 @@ const Home = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
               {["Pick a Topic", "Race the Clock", "Learn & Improve"].map((title, i) => (
                 <div className="text-center" key={i}>
-                  <div className="w-12 h-12 bg-[rgba(255,255,255,0.4)] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 bg-[rgba(115,114,114,0.4)] rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-neutral-50 font-bold">{i + 1}</span>
                   </div>
                   <h3 className="font-semibold text-neutral-50 mb-2">{title}</h3>
@@ -183,6 +183,9 @@ const Home = () => {
               />
             ))}
           </div>
+        </div>
+        <div className="flex justify-center text-md text-neutral-100">
+          More challenges coming soon..
         </div>
       </div>
       <div className='flex justify-center pb-2 text-neutral-400'>
