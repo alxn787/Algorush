@@ -87,7 +87,6 @@ The response must be a valid JSON array of objects, strictly adhering to the fol
 
   } catch (error) {
     console.error("Error generating questions:", error);
-    // Cast error to Error to safely access message property
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: `Failed to generate questions: ${errorMessage}` }, { status: 500 });
   }
