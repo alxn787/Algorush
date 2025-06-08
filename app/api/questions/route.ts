@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
     }
 
-    // System prompt combined with user content for Gemini API
     const fullPrompt = `You are a helpful assistant designed to create quiz questions for a Data Structures and Algorithms (DSA) practice app.
 Your task is to generate 10 multiple-choice questions on the topic: "${category}".
 Questions should contain incomplete code snippets, and the correct option should complete them.
@@ -27,7 +26,6 @@ The response must be a valid JSON array of objects, strictly adhering to the fol
 - "explanation": A concise explanation for why the correct answer is right.
 - "difficulty": A string indicating the difficulty, one of "Easy", "Medium", or "Hard".`;
 
-    // Construct the payload for the Gemini API call
     let chatHistory = [];
     chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
 
