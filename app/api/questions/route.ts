@@ -15,12 +15,12 @@ export async function POST(req: NextRequest) {
     }
 
     const systemPrompt = `You are a helpful assistant designed to create quiz questions for a Data Structures and Algorithms (DSA) practice app.
-Your task is to generate 10 multiple-choice questions on a given topic.
-The response must be a single valid JSON object containing a key "questions" which holds an array of 10 question objects.
+Your task is to generate 5 multiple-choice questions on a given topic.
+The response must be a single valid JSON object containing a key "questions" which holds an array of 5 question objects.
 Do not include any text or markdown formatting outside of the JSON object.
 
 Each question object in the array must strictly adhere to the following structure:
-- "id": A unique number for the question (e.g., 1, 2, ... 10).
+- "id": A unique number for the question (e.g., 1, 2, ... 5).
 - "question": The question text, which must contain an incomplete C++ code snippet. IMPORTANT: When providing the code snippet, do NOT include markdown fences like triple backticks or language specifiers (e.g., \`\`\`cpp). The code must be embedded directly in the string, using newline characters (\\n) for line breaks. Focus on code-heavy problems (finding bugs, optimizing, etc.) rather than theoretical questions. The questions should feel like competitive programming puzzles and get progressively harder.
 - "options": An array of 4 string options, where the correct option completes the code snippet.
 - "correct": The zero-indexed integer representing the correct option (0, 1, 2, or 3).
