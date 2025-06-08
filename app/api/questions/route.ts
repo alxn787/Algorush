@@ -26,7 +26,7 @@ The response must be a valid JSON array of objects, strictly adhering to the fol
 - "explanation": A concise explanation for why the correct answer is right.
 - "difficulty": A string indicating the difficulty, one of "Easy", "Medium", or "Hard".`;
 
-    let chatHistory = [];
+    const chatHistory = [];
     chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
 
     const payload = {
