@@ -15,10 +15,13 @@ import {
 } from 'lucide-react'
 import CategoryCard from '@/components/CategoryCard'
 import { StarButton } from '@/components/StarButton'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
+import { useQuizCache } from '@/context/QuizCacheContext'
+
 
 const Home = () => {
   const router = useRouter()
+  const { fetchAndCacheQuestions } = useQuizCache();
 
   const categories = [
     {
@@ -54,6 +57,14 @@ const Home = () => {
       estimatedTime: "10-15 min"
     }
   ];
+
+  useEffect(() => {
+    categories.forEach(category => {
+      fetchAndCacheQuestions(category.title).catch(error => {
+        console.error(`Error prefetching questions for ${category.title}:`, error);
+      });
+    });
+  }, [categories, fetchAndCacheQuestions]);
 
   const handleCategoryClick = (category: typeof categories[0]) => {
     router.push(`/quiz?category=${encodeURIComponent(category.title)}`)

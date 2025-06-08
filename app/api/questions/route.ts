@@ -17,6 +17,8 @@ Focus more on code-heavy problems (finding bugs, optimizing, etc.) than theoreti
 make it more puzzle like competitive programmming
 Give the code snippets in C++.
 Always return exactly 10 questions.
+When providing code snippets within the "question" field, do NOT include triple backticks  or language specifiers (like cpp). Embed the C++ code directly into the string, using newline characters (\n) for line breaks. For example, a code snippet might look like: "int main() {\n  // some code\n}".
+
 
 The response must be a valid JSON array of objects, strictly adhering to the following structure for each question:
 - "id": A unique number for the question (e.g., 1, 2, ... 10).

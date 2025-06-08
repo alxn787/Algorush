@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Clock, CheckCircle, XCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { useQuizCache } from '@/context/QuizCacheContext';
 
 interface Question {
   id: number;
@@ -16,10 +17,12 @@ interface Question {
   difficulty: 'Easy' | 'Medium' | 'Hard';
 }
 
-const QuizClientComponent = () => {
+const QuizClientComponent = () => { 
   const router = useRouter();
   const searchParams = useSearchParams();
   const category = searchParams.get('category') || 'Dynamic Programming';
+  
+  const { fetchAndCacheQuestions } = useQuizCache();
   
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,63 +37,38 @@ const QuizClientComponent = () => {
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [quizReady, setQuizReady] = useState(false); 
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setIsLoading(true);
-      setError(null);
-      setQuizReady(false);
-      try {
-        const response = await fetch('/api/questions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ category }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
-        }
-
-        const data: Question[] = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setQuestions(data);
-          setQuizReady(true);
-        } else {
-          setError('No questions found for this category.');
-          setQuestions([]);
-        }
-      } catch (err) {
-        setError('Could not load quiz. Please try again later.');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+  const loadQuestions = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    setQuizReady(false);
+    try {
+      const data = await fetchAndCacheQuestions(category); 
+      if (Array.isArray(data) && data.length > 0) {
+        setQuestions(data);
+        setQuizReady(true);
+      } else {
+        setError('No questions found for this category.');
+        setQuestions([]);
       }
-    };
-
-    if (category) {
-      fetchQuestions();
+    } catch (err: any) {
+      setError(err.message || 'Could not load quiz. Please try again later.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [category]);
+  }, [category, fetchAndCacheQuestions]);
 
   useEffect(() => {
-    if (quizReady && timeLeft > 0 && !showResult && !quizCompleted) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (quizReady && timeLeft === 0 && !showResult) {
-      handleNext();
+    if (category) {
+      loadQuestions();
     }
-  }, [timeLeft, showResult, quizCompleted, quizReady]);
+  }, [category, loadQuestions]);
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    setSelectedAnswer(answerIndex);
-  };
-
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const newAnswers = [...answers, selectedAnswer];
     setAnswers(newAnswers);
     
-    if (selectedAnswer === questions[currentQuestion].correct) {
+    if (selectedAnswer === questions[currentQuestion]?.correct) { 
       setScore(score + 1);
     }
     
@@ -107,21 +85,28 @@ const QuizClientComponent = () => {
         setQuizReady(false);
       }
     }, 2000);
+  }, [answers, selectedAnswer, questions, currentQuestion, score]);
+
+  useEffect(() => {
+    if (quizReady && timeLeft > 0 && !showResult && !quizCompleted) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (quizReady && timeLeft === 0 && !showResult) {
+      handleNext();
+    }
+  }, [timeLeft, showResult, quizCompleted, quizReady, handleNext]);
+
+  const handleAnswerSelect = (answerIndex: number) => {
+    setSelectedAnswer(answerIndex);
   };
 
-  const resetQuiz = () => {
-    const fetchNewQuestions = async () => {
-      setIsLoading(true);
-      setError(null);
-      setQuizReady(false);
-      try {
-        const response = await fetch('/api/questions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ category }),
-        });
-        if (!response.ok) throw new Error('Failed to fetch');
-        const data: Question[] = await response.json();
+  const resetQuiz = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+    setQuizReady(false);
+
+    fetchAndCacheQuestions(category, true)
+      .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setQuestions(data);
           setCurrentQuestion(0);
@@ -136,15 +121,15 @@ const QuizClientComponent = () => {
           setError('No questions found for this category.');
           setQuestions([]);
         }
-      } catch (err) {
+      })
+      .catch(err => {
         console.error('Error fetching new questions:', err);
         setError('Could not restart quiz. Please try again.');
-      } finally {
+      })
+      .finally(() => {
         setIsLoading(false);
-      }
-    };
-    fetchNewQuestions();
-  };
+      });
+  }, [category, fetchAndCacheQuestions]);
 
   if (isLoading) {
     return (
@@ -274,7 +259,7 @@ const QuizClientComponent = () => {
             {question.options.map((option, index) => (
               <button
                 key={index}
-                onClick={() => !showResult && handleAnswerSelect(index)}
+                onClick={() => handleAnswerSelect(index)}
                 disabled={showResult}
                 className={`w-full p-4 text-left rounded-lg border transition-all duration-200 text-white ${
                   showResult
