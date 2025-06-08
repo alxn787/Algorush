@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -20,15 +21,15 @@ Do not include any text or markdown formatting outside of the JSON object.
 
 Each question object in the array must strictly adhere to the following structure:
 - "id": A unique number for the question (e.g., 1, 2, ... 10).
-- "question": The question text, which must contain an incomplete C++ code snippet. Use newline characters (\\n) for line breaks within the string. Focus on code-heavy problems (finding bugs, optimizing, etc.) rather than theoretical questions. The questions should feel like competitive programming puzzles and get progressively harder.
+- "question": The question text, which must contain an incomplete C++ code snippet. IMPORTANT: When providing the code snippet, do NOT include markdown fences like triple backticks or language specifiers (e.g., \`\`\`cpp). The code must be embedded directly in the string, using newline characters (\\n) for line breaks. Focus on code-heavy problems (finding bugs, optimizing, etc.) rather than theoretical questions. The questions should feel like competitive programming puzzles and get progressively harder.
 - "options": An array of 4 string options, where the correct option completes the code snippet.
 - "correct": The zero-indexed integer representing the correct option (0, 1, 2, or 3).
 - "explanation": A concise explanation for why the correct answer is right.
 - "difficulty": A string indicating the difficulty, one of "Easy", "Medium", or "Hard".`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", 
-      response_format: { type: "json_object" }, 
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
@@ -39,10 +40,9 @@ Each question object in the array must strictly adhere to the following structur
           content: `Please generate the 10 questions for the category: "${category}"`,
         },
       ],
-      temperature: 0.5, // A lower temperature for more predictable, structured output
+      temperature: 0.5,
     });
 
-    // 4. Extract and parse the JSON response
     const jsonString = completion.choices[0]?.message?.content;
 
     if (!jsonString) {
@@ -50,7 +50,7 @@ Each question object in the array must strictly adhere to the following structur
     }
 
     const result = JSON.parse(jsonString);
-    const questions = result.questions; 
+    const questions = result.questions;
 
     if (!Array.isArray(questions) || questions.length === 0) {
         throw new Error("OpenAI API did not return a valid array of questions.");
