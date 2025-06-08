@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,88 +13,57 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
     }
 
-    const fullPrompt = `You are a helpful assistant designed to create quiz questions for a Data Structures and Algorithms (DSA) practice app.
-Your task is to generate 10 multiple-choice questions on the topic: "${category}".
-Questions should contain incomplete code snippets, and the correct option should complete them.
-Questions should get harder as we move from 1 to 10.
-Focus more on code-heavy problems (finding bugs, optimizing, etc.) than theoretical questions.
-make it more puzzle like competitive programmming
-Give the code snippets in C++.
-Always return exactly 10 questions.
-When providing code snippets within the "question" field, do NOT include triple backticks  or language specifiers (like cpp). Embed the C++ code directly into the string, using newline characters (\n) for line breaks. For example, a code snippet might look like: "int main() {\n  // some code\n}".
+    const systemPrompt = `You are a helpful assistant designed to create quiz questions for a Data Structures and Algorithms (DSA) practice app.
+Your task is to generate 10 multiple-choice questions on a given topic.
+The response must be a single valid JSON object containing a key "questions" which holds an array of 10 question objects.
+Do not include any text or markdown formatting outside of the JSON object.
 
-
-The response must be a valid JSON array of objects, strictly adhering to the following structure for each question:
+Each question object in the array must strictly adhere to the following structure:
 - "id": A unique number for the question (e.g., 1, 2, ... 10).
-- "question": The question text, which can include formatted code snippets. Use newline characters (\\n) for line breaks within the string.
-- "options": An array of 4 string options.
+- "question": The question text, which must contain an incomplete C++ code snippet. Use newline characters (\\n) for line breaks within the string. Focus on code-heavy problems (finding bugs, optimizing, etc.) rather than theoretical questions. The questions should feel like competitive programming puzzles and get progressively harder.
+- "options": An array of 4 string options, where the correct option completes the code snippet.
 - "correct": The zero-indexed integer representing the correct option (0, 1, 2, or 3).
 - "explanation": A concise explanation for why the correct answer is right.
 - "difficulty": A string indicating the difficulty, one of "Easy", "Medium", or "Hard".`;
 
-    const chatHistory = [];
-    chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
-
-    const payload = {
-      contents: chatHistory,
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              "id": { "type": "NUMBER" },
-              "question": { "type": "STRING" },
-              "options": {
-                "type": "ARRAY",
-                "items": { "type": "STRING" }
-              },
-              "correct": { "type": "NUMBER" },
-              "explanation": { "type": "STRING" },
-              "difficulty": { "type": "STRING", "enum": ["Easy", "Medium", "Hard"] }
-            },
-            "required": ["id", "question", "options", "correct", "explanation", "difficulty"],
-            "propertyOrdering": ["id", "question", "options", "correct", "explanation", "difficulty"]
-          }
-        }
-      }
-    };
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o", 
+      response_format: { type: "json_object" }, 
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `Please generate the 10 questions for the category: "${category}"`,
+        },
+      ],
+      temperature: 0.5, // A lower temperature for more predictable, structured output
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Gemini API error:", errorData);
-      throw new Error(`Failed to fetch questions from Gemini API: ${JSON.stringify(errorData)}`);
+    // 4. Extract and parse the JSON response
+    const jsonString = completion.choices[0]?.message?.content;
+
+    if (!jsonString) {
+      throw new Error("OpenAI API returned an empty response.");
     }
 
-    const result = await response.json();
-    if (result.candidates && result.candidates.length > 0 &&
-        result.candidates[0].content && result.candidates[0].content.parts &&
-        result.candidates[0].content.parts.length > 0) {
-      const questionsJsonString = result.candidates[0].content.parts[0].text;
-      const questions = JSON.parse(questionsJsonString);
-      console.log("Generated Questions:", questions);
+    const result = JSON.parse(jsonString);
+    const questions = result.questions; 
 
-      if (!Array.isArray(questions)) {
-        throw new Error("Gemini API did not return an array of questions.");
-      }
-
-      return NextResponse.json(questions);
-    } else {
-      throw new Error("Failed to get a valid response from Gemini API.");
+    if (!Array.isArray(questions) || questions.length === 0) {
+        throw new Error("OpenAI API did not return a valid array of questions.");
     }
+    
+    console.log("Generated Questions:", questions);
+
+    return NextResponse.json(questions);
 
   } catch (error) {
-    console.error("Error generating questions:", error);
+    console.error("Error generating questions with OpenAI:", error);
 
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return NextResponse.json({ error: `Failed to generate questions: ${errorMessage}` }, { status: 500 });
   }
 }
