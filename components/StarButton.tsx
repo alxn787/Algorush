@@ -19,8 +19,6 @@ export function StarButton() {
           await controls.start({ scale: 1, transition: { duration: 0.2 } })
           await controls.start({ scale: 1.05, transition: { duration: 0.2 } })
           await controls.start({ scale: 1, transition: { duration: 0.2 } })
-          
-          // Star icon animation
           await starIconControls.start({ 
             rotate: [0, 15, -15, 0],
             scale: [1, 1.2, 1.2, 1],
@@ -38,7 +36,7 @@ export function StarButton() {
 
   return (
     <motion.a
-      href="https://github.com/alxn787/"
+      href="https://github.com/alxn787/newalgo"
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center px-3 py-1.5 rounded-full bg-neutral-800 shadow-md borderborder-neutral-700 text-sm font-medium text-neutral-200 transition-all"
