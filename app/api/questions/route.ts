@@ -26,7 +26,7 @@ The response must be a valid JSON array of objects, strictly adhering to the fol
 - "explanation": A concise explanation for why the correct answer is right.
 - "difficulty": A string indicating the difficulty, one of "Easy", "Medium", or "Hard".`;
 
-    const chatHistory = [];
+    let chatHistory = [];
     chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
 
     const payload = {
@@ -87,6 +87,7 @@ The response must be a valid JSON array of objects, strictly adhering to the fol
 
   } catch (error) {
     console.error("Error generating questions:", error);
+
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: `Failed to generate questions: ${errorMessage}` }, { status: 500 });
   }
