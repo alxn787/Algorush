@@ -1,5 +1,5 @@
 'use client';
-
+import axios from 'axios';
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
 interface Question {
@@ -30,32 +30,20 @@ export const QuizCacheProvider = ({ children }: { children: ReactNode }) => {
       console.log(`Using cached questions for ${category}`);
       return cachedQuestions[category];
     }
-
-    try {
-      console.log(`Fetching new questions for ${category}`);
-      const response = await fetch('/api/questions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ category }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch questions');
-      }
-
-      const data: Question[] = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setCachedQuestions(prev => ({ ...prev, [category]: data }));
-        return data;
-      } else {
-        throw new Error('No questions found for this category.');
-      }
-    } catch (error) {
-      console.error(`Error fetching or caching questions for ${category}:`, error);
-      throw error;
+        try {
+    console.log(`Fetching new questions for ${category}`);
+    const response = await axios.post('/api/questions', { category });
+    const data: Question[] = response.data;
+    if (Array.isArray(data) && data.length > 0) {
+      setCachedQuestions(prev => ({ ...prev, [category]: data }));
+      return data;
+    } else {
+      throw new Error('No questions found for this category.');
     }
+  } catch (error) {
+    console.error(`Error fetching or caching questions for ${category}:`, error);
+    throw error;
+  }
   }, [cachedQuestions]);
 
   return (
